@@ -4,6 +4,9 @@ class Sommet:
         self.nom = nom
         self.out = []
 
+    def compare_degree(self):
+        return len(self.get_connections())
+
     def get_nom(self):
         return self.nom
 
