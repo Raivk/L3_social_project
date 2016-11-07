@@ -25,13 +25,6 @@ class Graphe:
                 res.append((som, som2))
         return res
 
-    def destroy_som(self,som):
-        if som in self.sommets:
-            for duo in self.get_arcs():
-                if duo[1] == som:
-                    duo[0].disconnect(som)
-            self.sommets.remove(som)
-
     def get_nb_util(self):
         total = 0
         for som in self.sommets:
@@ -66,6 +59,9 @@ class Graphe:
 
     def remove_sommet(self, som):
         if som in self.sommets:
+            for duo in self.get_arcs():
+                if duo[1] == som:
+                    duo[0].disconnect(som)
             self.sommets.remove(som)
 
     def connect(self, som1, som2):

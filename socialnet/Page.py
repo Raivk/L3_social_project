@@ -1,5 +1,5 @@
 from Sommet import Sommet
-
+from Utilisateur import Utilisateur
 
 class Page(Sommet):
 
@@ -11,7 +11,7 @@ class Page(Sommet):
         return self.admins
 
     def add_admin(self, admin):
-        if admin not in self.admins:
+        if admin not in self.admins and isinstance(admin, Utilisateur):
             self.admins.append(admin)
 
     def remove_admin(self, admin):
