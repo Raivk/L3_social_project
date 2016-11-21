@@ -21,8 +21,11 @@ class Sommet:
         if som in self.out:
             self.out.remove(som)
 
+    def magie(self):
+        return self.magie()
+
     def __str__(self):
-        return self.get_nom() + " out : " + self.out.__repr__()
+        return self.get_nom()
 
     def __repr__(self):
         return "<" + self.get_nom() + " out : " + self.out.__repr__() + ">"

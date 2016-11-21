@@ -24,5 +24,18 @@ class Page(Sommet):
     def disconnect(self, som):
         print("A page cannot disconnect to anything")
 
+    def magie(self):
+        res = ":" + "P" + ":" + self.nom
+        return res
+
     def __repr__(self):
-        return "<" + Sommet.__str__(self) + " admins : " + self.admins.__repr__() + ">"
+        res = "<" + self.nom + " admins:["
+        for i in self.admins:
+            if i == self.admins[-1]:
+                res += "<" + i.__str__() + ">"
+            else:
+                res += "<" + i.__str__() + "> ,"
+        return res + "]>"
+
+    def __str__(self):
+        return Sommet.__str__(self)

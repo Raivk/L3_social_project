@@ -8,6 +8,8 @@ p = Page("DogeLand.com")
 g.add_sommet(u)
 g.add_sommet(p)
 u.connect(p)
+u.connect(u2)
+u2.connect(u)
 
 print(g)
 print(u)
@@ -26,6 +28,7 @@ print(g.get_nb_page())
 print(g.get_moy_age())
 print(g.get_admins())
 g.save()
+g.ouv("lasauvegardedelamortquitue.stylux")
 
 # from kivy.app import App
 # from kivy.uix.button import Button
