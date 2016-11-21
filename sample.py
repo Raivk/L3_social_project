@@ -25,6 +25,7 @@ print(g.get_nb_util())
 print(g.get_nb_page())
 print(g.get_moy_age())
 print(g.get_admins())
+g.save()
 
 # from kivy.app import App
 # from kivy.uix.button import Button

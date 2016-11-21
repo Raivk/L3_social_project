@@ -81,5 +81,11 @@ class Graphe:
             total += len(som.get_connections())
         return total
 
+    def save(self):
+        fichier = open("lasauvegardedelamortquitue.stylux", "a")
+        fichier.write(self.sommets.__repr__())
+        fichier.write("\n")
+        fichier.close()
+
     def __repr__(self):
         return self.sommets.__repr__()
