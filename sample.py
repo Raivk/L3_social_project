@@ -1,6 +1,8 @@
 from socialnet.Graphe import Graphe,Sommet,Utilisateur,Page
+import time
 
 g = Graphe()
+gtest = Graphe()
 u = Utilisateur("Perroni","Pep",50)
 u2 = Utilisateur("test","nucleaire",20)
 p = Page("DogeLand.com")
@@ -28,7 +30,31 @@ print(g.get_nb_page())
 print(g.get_moy_age())
 print(g.get_admins())
 g.save()
-g.ouv("lasauvegardedelamortquitue.stylux")
+gtest.ouv("lasauvegardedelamortquitue.stylux")
+
+print("test save charge")
+
+print(gtest.som_len())
+print(g.som_len())
+print(gtest.arc_len())
+print(g.arc_len())
+print(gtest.get_sommets_by_name())
+print(g.get_sommets_by_name())
+print(gtest.get_sommets_by_degree())
+print(g.get_sommets_by_degree())
+print(gtest.get_arcs())
+print(g.get_arcs())
+print("------------")
+print(gtest.get_nb_util())
+print(g.get_nb_util())
+print(gtest.get_nb_page())
+print(g.get_nb_page())
+print(gtest.get_moy_age())
+print(g.get_moy_age())
+print(gtest.get_admins())
+print(g.get_admins())
+
+
 
 # from kivy.app import App
 # from kivy.uix.button import Button

@@ -21,7 +21,7 @@ class Utilisateur(Sommet):
         Sommet.disconnect(self, som)
 
     def magie(self):
-        res = ":" + "U" + ":[" + self.nom + "," + self.prenom + "," + str(self.age) + "]"
+        res = ":" + "U" + ":" + self.nom + "," + self.prenom + "," + str(self.age)
         return res
 
     def __repr__(self):

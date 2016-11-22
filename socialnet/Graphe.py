@@ -95,7 +95,7 @@ class Graphe:
             for id2 in sommets_fic.keys():
                 sommet2 = sommets_fic.get(id2)
                 if sommet2 in sommet.get_connections():
-                    fichier.write("[" + str(idf) + "," + str(id2) + "]\n" ) #1 suit 2
+                    fichier.write(str(idf) + "," + str(id2) + "\n" ) #1 suit 2
         fichier.write("---\n")
         for idf in sommets_fic.keys():
             sommet = sommets_fic.get(idf)
@@ -104,7 +104,7 @@ class Graphe:
                     admins = sommet.get_admins()
                     for possible in sommets_fic:
                         if sommets_fic.get(possible) in admins:
-                            fichier.write("[" + str(idf) + "," + str(possible) + "]") #page, admin
+                            fichier.write(str(idf) + "," + str(possible)) #page, admin
 
         fichier.close()
 
@@ -113,9 +113,30 @@ class Graphe:
 
     def ouv(self, path):
         fichier = open(path, "r")
-        #for ligne in fichier.read():
-        #    test
+        i = 0
+        somm = {}
+        for ligne in fichier.readlines():
+            ligne = ligne.replace("\n", "")
+            if ligne == "---":
+                i = i + 1
+            else:
+                if i == 0:
+                    str = ligne.split(":")
+                    if str[1] == "U":
+                        carac = str[2].split(",")
+                        somm[str[0]] = Utilisateur(carac[0], carac[1], int(carac[2]))
+                        self.add_sommet(somm[str[0]])
+                    if str[1] == "P":
+                        somm[str[0]] = Page(str[2])
+                        self.add_sommet(somm[str[0]])
+                if i == 1:
+                    str = ligne.split(",")
+                    somm[str[0]].connect(somm[str[1]])
+                if i == 2:
+                    str = ligne.split(",")
+                    somm[str[0]].add_admin(somm[str[1]])
         fichier.close()
+
     def __repr__(self):
         res = "["
         for i in self.sommets:
