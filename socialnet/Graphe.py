@@ -25,6 +25,14 @@ class Graphe:
                 res.append((som, som2))
         return res
 
+    def get_arcs_admins(self):
+        res = []
+        for som in self.sommets:
+            if isinstance(som,Page):
+                for som2 in som.admins:
+                    res.append((som, som2))
+        return res
+
     def get_nb_util(self):
         total = 0
         for som in self.sommets:
@@ -62,6 +70,10 @@ class Graphe:
             for duo in self.get_arcs():
                 if duo[1] == som:
                     duo[0].disconnect(som)
+            if not isinstance(som, Page):
+                for duo in self.get_arcs_admins():
+                    if duo[1] == som:
+                        duo[0].remove_admin(som)
             self.sommets.remove(som)
 
     def connect(self, som1, som2):
@@ -80,6 +92,43 @@ class Graphe:
         for som in self.sommets:
             total += len(som.get_connections())
         return total
+
+    def page_rank(self):
+        res = {}
+        for som in self.sommets:
+            res[som] = 1
+        i = 0
+        while i <= 100:
+            for som in self.sommets:
+                tempPr = 0
+                for som2 in self.sommets:
+                    if som in som2.out:
+                        tempPr += (res[som2] / float(len(som2.out)))
+                res[som] = (0.15 / float(len(self.sommets))) + (0.85 * tempPr)
+            i += 1
+        return res
+
+    def plus_courte_distance(self, source):
+        res = {}
+        for som in self.sommets:
+            if som == source:
+                res[som] = 0
+            else:
+                res[som] = 10000000
+        copy = res.keys()
+        while len(copy) != 0:
+            found = copy[0]
+            min = res[found]
+            for som in copy:
+                if res[som] < min:
+                    min = res[som]
+                    found = som
+            copy.remove(found)
+            for som2 in found.out:
+                alt = res[found] + 1
+                if alt <= res[som2]:
+                    res[som2] = alt
+        return res
 
     def save(self):
         sommets_fic = {}
