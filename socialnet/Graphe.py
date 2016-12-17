@@ -33,6 +33,13 @@ class Graphe:
                     res.append((som, som2))
         return res
 
+    def find_name(self,name):
+        for som in self.sommets:
+            if som.nom == name:
+                return som
+        print("Pas de sommet trouve pour le nom '" + name + "' !")
+        return False
+
     def get_nb_util(self):
         total = 0
         for som in self.sommets:
