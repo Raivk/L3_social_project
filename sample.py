@@ -13,47 +13,16 @@ u.connect(p)
 u.connect(u2)
 u2.connect(u)
 
-print(g)
-print(u)
-print(p)
-print(g.som_len())
-print(g.arc_len())
-print(g.get_sommets_by_name())
-print(g.get_sommets_by_degree())
-print(g.get_arcs())
-print("------------")
-
 g.add_sommet(u2)
 p.add_admin(u2)
-print(g.get_nb_util())
-print(g.get_nb_page())
-print(g.get_moy_age())
-print(g.get_admins())
+
+print(g)
+
 g.save()
 gtest.ouv("lasauvegardedelamortquitue.stylux")
 
-print("test save charge")
-
-print(gtest.som_len())
-print(g.som_len())
-print(gtest.arc_len())
-print(g.arc_len())
-print(gtest.get_sommets_by_name())
-print(g.get_sommets_by_name())
-print(gtest.get_sommets_by_degree())
-print(g.get_sommets_by_degree())
-print(gtest.get_arcs())
-print(g.get_arcs())
-print("------------")
-print(gtest.get_nb_util())
-print(g.get_nb_util())
-print(gtest.get_nb_page())
-print(g.get_nb_page())
-print(gtest.get_moy_age())
-print(g.get_moy_age())
-print(gtest.get_admins())
-print(g.get_admins())
-
+print("-----test ouverture-----")
+print(gtest)
 
 
 # from kivy.app import App

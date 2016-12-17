@@ -91,23 +91,39 @@ class Graphe:
             i = i + 1
         fichier.write("---\n")
         for idf in sommets_fic.keys():
+            toWrite = str(idf) + ":"
             sommet = sommets_fic.get(idf)
+            wrote = False
             for id2 in sommets_fic.keys():
                 sommet2 = sommets_fic.get(id2)
                 if sommet2 in sommet.get_connections():
-                    fichier.write(str(idf) + "," + str(id2) + "\n" ) #1 suit 2
+                    if not wrote:
+                        toWrite += str(id2)  # 1 suit 2
+                    else:
+                        toWrite += "," + str(id2)  # 1 suit 2
+                    wrote = True;
+                    #fichier.write(str(idf) + "," + str(id2) + "\n")  #1 suit 2
+            if wrote:
+                fichier.write(toWrite + "\n")
+
         fichier.write("---\n")
         for idf in sommets_fic.keys():
             sommet = sommets_fic.get(idf)
             if isinstance(sommet, Page):
                 if sommet.get_admins() != None:
+                    toWrite = str(idf) + ":"
                     admins = sommet.get_admins()
+                    wrote = False
                     for possible in sommets_fic:
                         if sommets_fic.get(possible) in admins:
-                            fichier.write(str(idf) + "," + str(possible)) #page, admin
-
-        fichier.close()
-
+                            if not wrote:
+                                toWrite += str(possible)  # 1 possede 2 en admin
+                            else:
+                                toWrite += "," + str(possible)  # 1 possede 2 en admin
+                            wrote = True
+                            #fichier.write(str(idf) + "," + str(possible)) #page, admin
+                    if wrote:
+                        fichier.write(toWrite + "\n")
 
         fichier.close()
 
@@ -130,11 +146,15 @@ class Graphe:
                         somm[str[0]] = Page(str[2])
                         self.add_sommet(somm[str[0]])
                 if i == 1:
-                    str = ligne.split(",")
-                    somm[str[0]].connect(somm[str[1]])
+                    firstUtil = ligne.split(":")[0]
+                    others = ligne.split(":")[1].split(",")
+                    for followed in others:
+                        somm[firstUtil].connect(somm[followed])
                 if i == 2:
-                    str = ligne.split(",")
-                    somm[str[0]].add_admin(somm[str[1]])
+                    thePage = ligne.split(":")[0]
+                    theAdmins = ligne.split(":")[1].split(",")
+                    for admin in theAdmins:
+                        somm[thePage].add_admin(somm[admin])
         fichier.close()
 
     def __repr__(self):
