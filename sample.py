@@ -1,4 +1,5 @@
 from socialnet.Graphe import Graphe,Sommet,Utilisateur,Page
+from socialnet.pyplotManager import PyplotManager
 import time
 
 g = Graphe()
@@ -22,6 +23,8 @@ print(g)
 
 g.save()
 gtest.ouv("lasauvegardedelamortquitue.stylux")
+PM = PyplotManager(g)
+PM.affiche(g)
 
 print("-----test ouverture-----")
 print(gtest)
