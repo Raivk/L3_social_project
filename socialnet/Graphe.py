@@ -1,6 +1,10 @@
 from Utilisateur import Utilisateur
 from Page import Page
 from Sommet import Sommet
+
+from socialnet.pyplotManager import PyplotManager
+import time
+
 import operator
 
 
@@ -8,6 +12,10 @@ class Graphe:
 
     def __init__(self):
         self.sommets = []
+
+    def affiche(self):
+        pm = PyplotManager(self)
+        pm.affiche(self)
 
     def get_sommets(self):
         return self.sommets
