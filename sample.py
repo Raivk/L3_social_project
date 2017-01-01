@@ -7,58 +7,216 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.uix.dropdown import DropDown
+from kivy.uix.popup import Popup
+from kivy.uix.boxlayout import BoxLayout
+from kivy.adapters.dictadapter import ListAdapter
+from kivy.uix.listview import ListView, ListItemButton
 
-
-class MainScreen(GridLayout):
+class MainScreen(BoxLayout):
 
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
-        self.cols = 2
+        self.orientation="vertical"
+        self.g = Graphe()
+        self.to_connect = [0,0]
+        self.to_disconnect = [0,0]
 
-        g = Graphe()
+        add_util = Button(text="Ajouter un utilisateur")
+        add_util.bind(on_press=lambda a : self.add_popup(True))
 
-        gl_inputs = GridLayout(cols=2)
-        gl_inputs.som_name = TextInput(multiline = False)
-        gl_inputs.add_widget(Label(text="Nom du sommet : "))
-        gl_inputs.add_widget(gl_inputs.som_name)
-        gl_inputs.add_widget(Label(text="Prenom de l'utilisateur"))
-        gl_inputs.som_firstname = TextInput(multiline = False)
-        gl_inputs.add_widget(gl_inputs.som_firstname)
-        gl_inputs.add_widget(Label(text="Age de l'utilisateur"))
-        gl_inputs.som_age = TextInput(multiline = False, input_filter='int')
-        gl_inputs.add_widget(gl_inputs.som_age)
-        gl_inputs.add_widget(Label(text="selectionnez un type : "))
+        self.add_widget(add_util)
 
-        dropdown = DropDown()
-        btn = Button(text='Utilisateur', size_hint_y=None, height=44)
-        btn.bind(on_release=lambda btn: dropdown.select(btn.text))
-        dropdown.add_widget(btn)
-        btn2 = Button(text='Page', size_hint_y=None, height=44)
-        btn2.bind(on_release=lambda btn2: dropdown.select(btn2.text))
-        dropdown.add_widget(btn2)
-        mainbutton = Button(text='Utilisateur', size_hint=(None, None))
-        mainbutton.bind(on_release=dropdown.open)
-        dropdown.bind(on_select=lambda instance, x: setattr(mainbutton, 'text', x))
-        gl_inputs.add_widget(mainbutton)
+        add_page = Button(text="Ajouter une page")
+        add_page.bind(on_press=lambda a: self.add_popup(False))
 
-        add_sommet = Button(text="Ajouter un sommet")
-        add_sommet.bind(on_press=lambda a : self.add_sommet(g, mainbutton.text, gl_inputs.som_name.text, gl_inputs.som_firstname.text, gl_inputs.som_age.text))
+        self.add_widget(add_page)
 
-        self.add_widget(add_sommet)
-        self.add_widget(gl_inputs)
+        add_connection = Button(text="Connecter")
+        add_connection.bind(on_press=lambda a: self.connect_popup())
+
+        self.add_widget(add_connection)
+
+        del_connection = Button(text="Deconnecter")
+        del_connection.bind(on_press=lambda a: self.disconnect_popup())
+
+        self.add_widget(del_connection)
 
         create_graph = Button(text="Afficher le graphe")
-        create_graph.bind(on_press=lambda a : self.callback(g))
+        create_graph.bind(on_press=lambda a : self.affiche())
         self.add_widget(create_graph)
 
-    def add_sommet(self, g, type, name, firstname="default", age=0):
-        if type == "Utilisateur":
-            g.add_sommet(Utilisateur(name, firstname, age))
-        if type == "Page":
-            g.add_sommet(Page(name))
+    def connect(self,popup):
+        self.g.connect(self.g.get_sommets()[self.to_connect[0]],
+                       self.g.get_sommets()[self.to_connect[1]])
+        popup.dismiss()
 
-    def callback(self, g):
-        print(g)
+    def selection_change(self, adapter, pos, adapter2, confirmButton):
+        if len(adapter.selection) == 1 and len(adapter2.selection) == 1:
+            confirmButton.disabled = False
+        self.to_connect[pos] = int(adapter.selection[0].text[0]) - 1
+
+    def selection_change_disco(self, adapter, pos, confirmButton):
+        self.to_disconnect[pos] = int(adapter.selection[0].text[0]) - 1
+        confirmButton.disabled = False
+
+    def disconnect(self, som, popup):
+        popup.dismiss()
+        self.g.disconnect(som, som.out[self.to_disconnect[1]])
+
+    def disconnect_popup2(self, popup):
+        popup.dismiss()
+
+        popup = Popup(title='Choisissez un second sommet',
+                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+        bl = BoxLayout(orientation='vertical')
+
+        confirm_button = Button(text="Confirmer")
+        confirm_button.disabled = True
+
+        som = self.g.get_sommets()[self.to_disconnect[0]]
+
+        list_adapter1 = ListAdapter(
+            data=[str(i + 1) + "- " + som.out[i].nom for i in range(len(som.out))],
+            cls=ListItemButton,
+            sorted_keys=[])
+        list_adapter1.bind(
+            on_selection_change=lambda a: self.selection_change_disco(list_adapter1, 1, confirm_button))
+        list_view1 = ListView(adapter=list_adapter1)
+
+        bl.add_widget(list_view1)
+
+        confirm_button.bind(on_press=lambda a: self.disconnect(som, popup))
+        cancel_button = Button(text="Annuler")
+        cancel_button.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(confirm_button)
+        bl.add_widget(cancel_button)
+
+        popup.content = bl
+        popup.open()
+
+    def disconnect_popup(self):
+        popup = Popup(title='Choisissez un premier sommet',
+                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+        bl = BoxLayout(orientation='vertical')
+
+        confirm_button = Button(text="Confirmer")
+        confirm_button.disabled = True
+
+        list_adapter1 = ListAdapter(
+            data=[str(i + 1) + "- " + self.g.get_sommets()[i].nom for i in range(len(self.g.get_sommets()))],
+            cls=ListItemButton,
+            sorted_keys=[])
+        list_adapter1.bind(
+            on_selection_change=lambda a: self.selection_change_disco(list_adapter1, 0, confirm_button))
+        list_view1 = ListView(adapter=list_adapter1)
+
+        bl.add_widget(list_view1)
+
+        confirm_button.bind(on_press=lambda a: self.disconnect_popup2(popup))
+        cancel_button = Button(text="Annuler")
+        cancel_button.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(confirm_button)
+        bl.add_widget(cancel_button)
+
+        popup.content = bl
+        popup.open()
+
+    def connect_popup(self):
+        popup = Popup(title='Connecter deux sommets',
+                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+        bl = BoxLayout(orientation='vertical')
+
+        confirm_button = Button(text="Confirmer")
+        confirm_button.disabled = True
+
+        gl_inputs = GridLayout(cols=2)
+
+        gl_inputs.add_widget(Label(text="Sommet 1"))
+        gl_inputs.add_widget(Label(text="Sommet 2"))
+
+        list_adapter1 = ListAdapter(data=[str(i + 1) + "- " + self.g.get_sommets()[i].nom for i in range(len(self.g.get_sommets()))], cls=ListItemButton,
+                                        sorted_keys=[])
+        list_adapter1.bind(on_selection_change=lambda a : self.selection_change(list_adapter1, 0, list_adapter2, confirm_button))
+        list_view1 = ListView(adapter=list_adapter1)
+
+        gl_inputs.add_widget(list_view1)
+
+        list_adapter2 = ListAdapter(data=[str(i + 1) + "- " + self.g.get_sommets()[i].nom for i in range(len(self.g.get_sommets()))], cls=ListItemButton,
+                                    sorted_keys=[])
+        list_adapter2.bind(on_selection_change=lambda a : self.selection_change(list_adapter2, 1, list_adapter1, confirm_button))
+        list_view2 = ListView(adapter=list_adapter2)
+
+        gl_inputs.add_widget(list_view2)
+
+        bl.add_widget(gl_inputs)
+
+        confirm_button.bind(on_press=lambda a: self.connect(popup))
+        cancel_button = Button(text="Annuler")
+        cancel_button.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(confirm_button)
+        bl.add_widget(cancel_button)
+
+        popup.content = bl
+        popup.open()
+
+    def add_popup(self,isUtil):
+        if isUtil:
+            popup = Popup(title='Ajouter un Utilisateur',
+                          size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+            bl = BoxLayout(orientation='vertical')
+
+            gl_inputs = GridLayout(cols=2)
+            gl_inputs.som_name = TextInput(multiline=False)
+            gl_inputs.add_widget(Label(text="Nom de l'utilisateur : "))
+            gl_inputs.add_widget(gl_inputs.som_name)
+            gl_inputs.add_widget(Label(text="Prenom de l'utilisateur"))
+            gl_inputs.som_firstname = TextInput(multiline=False)
+            gl_inputs.add_widget(gl_inputs.som_firstname)
+            gl_inputs.add_widget(Label(text="Age de l'utilisateur"))
+            gl_inputs.som_age = TextInput(multiline=False, input_filter='int')
+            gl_inputs.add_widget(gl_inputs.som_age)
+
+            bl.add_widget(gl_inputs)
+
+            confirm_button = Button(text="Confirmer")
+            confirm_button.bind(on_press=lambda a: self.add_sommet_popup(popup,"Utilisateur",gl_inputs.som_name.text,gl_inputs.som_firstname.text,gl_inputs.som_age.text))
+            cancel_button = Button(text="Annuler")
+            cancel_button.bind(on_press=lambda a: popup.dismiss())
+            bl.add_widget(confirm_button)
+            bl.add_widget(cancel_button)
+            popup.content = bl
+            popup.open()
+        else:
+            popup = Popup(title='Ajouter une Page',
+                          size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+            bl = BoxLayout(orientation='vertical')
+
+            gl_inputs = GridLayout(cols=2)
+            gl_inputs.som_name = TextInput(multiline=False)
+            gl_inputs.add_widget(Label(text="Nom de la page : "))
+            gl_inputs.add_widget(gl_inputs.som_name)
+
+            bl.add_widget(gl_inputs)
+
+            confirm_button = Button(text="Confirmer")
+            confirm_button.bind(on_press=lambda a : self.add_sommet_popup(popup,"Page",gl_inputs.som_name.text))
+            cancel_button = Button(text="Annuler")
+            cancel_button.bind(on_press=lambda a : popup.dismiss())
+            bl.add_widget(confirm_button)
+            bl.add_widget(cancel_button)
+            popup.content = bl
+            popup.open()
+
+    def add_sommet_popup(self, popup, type, name, firstname="default", age=0):
+        if type == "Utilisateur":
+            self.g.add_sommet(Utilisateur(name, firstname, age))
+            popup.dismiss()
+        if type == "Page":
+            self.g.add_sommet(Page(name))
+            popup.dismiss()
+
+    def affiche(self):
+        self.g.affiche()
 
 class TestApp(App):
     def build(self):

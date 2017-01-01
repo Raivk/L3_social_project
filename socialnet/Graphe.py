@@ -14,8 +14,9 @@ class Graphe:
         self.sommets = []
 
     def affiche(self):
-        pm = PyplotManager(self)
-        pm.affiche(self)
+        # pm = PyplotManager(self)
+        # pm.refresh(self)
+        print(self)
 
     def get_sommets(self):
         return self.sommets
