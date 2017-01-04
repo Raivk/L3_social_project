@@ -4,17 +4,12 @@ from Page import Page
 
 class PyplotManager:
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
+
 
     def __init__(self, g):
-        plt.ion()
-        self.fig = plt.figure()
-        self.prepa(g)
+        self.deja = False
 
-
-    def prepa(self, g): #preparation de l'affichage de graph
-        self.ax = self.fig.add_subplot(111)
+    def prepa(self, g): #prepare l'affichage du graph
         tous = []
         sommets_fic = {}
         i = 0
@@ -42,35 +37,26 @@ class PyplotManager:
                         if sommets_fic.get(possible) in admins:
                             self.drawArrow(tous[idf], tous[possible])
 
-
+    def refresh(self, g): #refresh l'affichage du graph
+        self.close()
+        self.prepa(g)
+        self.affiche(g)
 
     def drawArrow(self, A, B): #ajoute un fleche
-        self.ax.arrow(A[0], A[1], B[0] - A[0], B[1] - A[1], head_width=0.05, head_length=0.1, fc='k', ec='k', length_includes_head=True)
+        plt.arrow(A[0], A[1], B[0] - A[0], B[1] - A[1], head_width=0.05, head_length=0.1, fc='k', ec='k', length_includes_head=True)
 
     def addPoint(self, A, type): #ajoute un point
         if type == "P":
-            self.ax.scatter(A[0], A[1], marker='p', s=80)
+            plt.scatter(A[0], A[1], marker='p', s=80)
         elif type == "U":
-            self.ax.scatter(A[0], A[1], marker='x', s=80)
+            plt.scatter(A[0], A[1], marker='x', s=80)
 
-    def refresh(self, g): #rafraichi entierrement le graph
-        self.ax.clear()
-        self.fig.clear()
-        self.prepa(g)
+    def close(self):
+        plt.close()
 
+    def affiche(self, g):
+        self.deja = True
+        plt.show(block=False)
 
-    def affiche(self, g):# test de modification
-        zert = 0
-        while True:
-            print(zert)
-            if (zert == 10):
-                self.drawArrow([0, 8], [1, 15])
-                self.ax.scatter(1, 2, marker='p', s=80)
-            elif (zert ==20):
-                self.refresh(g)
-            self.fig.canvas.draw()
-            zert = zert + 1
-
-
-
-
+    def getdeja(self):
+        return self.deja
