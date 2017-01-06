@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from Utilisateur import Utilisateur
 from Page import Page
+import random
 
 class PyplotManager:
 
@@ -8,26 +9,34 @@ class PyplotManager:
 
     def __init__(self, g):
         self.deja = False
+        self.tous = []
 
     def prepa(self, g): #prepare l'affichage du graph
-        tous = []
         sommets_fic = {}
         i = 0
+
         for sommet in g.get_sommets():
-            if isinstance(sommet, Page):
-                tous.append([i, 10, "P", sommet])
-                self.addPoint(tous[i])
-            elif isinstance(sommet, Utilisateur):
-                tous.append([i, 5, "U", sommet])
-                self.addPoint(tous[i])
-            sommets_fic[i] = sommet
+            valid = False
+            for elem in self.tous:
+                if elem[3] == sommet:
+                    self.addPoint(self.tous[i])
+                    valid = True
+            if valid == False:
+                randx, randy = self.randvalid()
+                if isinstance(sommet, Page):
+                    self.tous.append([randx, randy, "P", sommet])
+                    self.addPoint(self.tous[i])
+                elif isinstance(sommet, Utilisateur):
+                    self.tous.append([randx, randy, "U", sommet])
+                    self.addPoint(self.tous[i])
+                sommets_fic[i] = sommet
             i = i + 1
         for idf in sommets_fic.keys():
             sommet = sommets_fic.get(idf)
             for id2 in sommets_fic.keys():
                 sommet2 = sommets_fic.get(id2)
                 if sommet2 in sommet.get_connections():
-                    self.drawArrow(tous[idf], tous[id2])
+                    self.drawArrow(self.tous[idf], self.tous[id2])
         for idf in sommets_fic.keys():
             sommet = sommets_fic.get(idf)
             if isinstance(sommet, Page):
@@ -35,7 +44,20 @@ class PyplotManager:
                     admins = sommet.get_admins()
                     for possible in sommets_fic:
                         if sommets_fic.get(possible) in admins:
-                            self.drawArrow(tous[idf], tous[possible])
+                            self.drawArrow(self.tous[idf], self.tous[possible])
+
+
+    def randvalid(self):
+        valid = False
+        while not valid:
+            randx = random.randint(0, 10)
+            randy = random.randint(0, 10)
+            if self.tous == []:
+                valid = True
+            for elem in self.tous:
+                if elem[0] != randx and elem[1] != randy:
+                    valid = True
+        return randx, randy
 
     def refresh(self, g): #refresh l'affichage du graph
         self.close()

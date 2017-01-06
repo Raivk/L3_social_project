@@ -12,10 +12,12 @@ class Graphe:
 
     def __init__(self):
         self.sommets = []
+        self.pm = None
 
     def affiche(self):
-        pm = PyplotManager(self)
-        pm.refresh(self)
+        if self.pm == None:
+            self.pm = PyplotManager(self)
+        self.pm.refresh(self)
         print(self)
 
     def get_sommets(self):
