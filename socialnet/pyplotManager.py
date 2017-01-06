@@ -16,10 +16,10 @@ class PyplotManager:
         for sommet in g.get_sommets():
             if isinstance(sommet, Page):
                 tous.append([i, 10, "P", sommet])
-                self.addPoint([i, 10], "P")
+                self.addPoint(tous[i])
             elif isinstance(sommet, Utilisateur):
                 tous.append([i, 5, "U", sommet])
-                self.addPoint([i, 5], "U")
+                self.addPoint(tous[i])
             sommets_fic[i] = sommet
             i = i + 1
         for idf in sommets_fic.keys():
@@ -45,11 +45,13 @@ class PyplotManager:
     def drawArrow(self, A, B): #ajoute un fleche
         plt.arrow(A[0], A[1], B[0] - A[0], B[1] - A[1], head_width=0.05, head_length=0.1, fc='k', ec='k', length_includes_head=True)
 
-    def addPoint(self, A, type): #ajoute un point
-        if type == "P":
-            plt.scatter(A[0], A[1], marker='p', s=80)
-        elif type == "U":
-            plt.scatter(A[0], A[1], marker='x', s=80)
+    def addPoint(self,sommet): #ajoute un point
+        if sommet[2] == "P":
+            plt.scatter(sommet[0], sommet[1], marker='p', s=80)
+            plt.annotate(sommet[3].get_nom(),(sommet[0],sommet[1]))
+        elif sommet[2] == "U":
+            plt.scatter(sommet[0], sommet[1], marker='x', s=80)
+            plt.annotate(sommet[3].get_nom(), (sommet[0], sommet[1]))
 
     def close(self):
         plt.close()
