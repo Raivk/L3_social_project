@@ -57,9 +57,238 @@ class MainScreen(BoxLayout):
 
         self.add_widget(del_admin)
 
+        display_soms = Button(text="Parcourir les sommets")
+        display_soms.bind(on_press=lambda a: self.parcours())
+
+        self.add_widget(display_soms)
+
+        algos = Button(text="Algos")
+        algos.bind(on_press=lambda a:self.algos())
+
+        self.add_widget(algos)
+
         create_graph = Button(text="Afficher le graphe")
         create_graph.bind(on_press=lambda a : self.affiche())
         self.add_widget(create_graph)
+
+    def popup_pagerank(self,popup):
+        popup.dismiss()
+
+        popup = Popup(title='PageRank',
+                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+        bl = BoxLayout(orientation='vertical')
+
+        pr = self.g.page_rank()
+
+        res = ""
+
+        for som in pr.keys():
+            res += som.nom + " : " + str(pr[som]) + "\n"
+
+        bl.add_widget(Label(text=res))
+
+        cancel_button = Button(text="Annuler")
+        cancel_button.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(cancel_button)
+
+        popup.content = bl
+        popup.open()
+
+    def disp_pcd(self,som):
+        popup = Popup(title='Plus courtes distances',
+                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+        bl = BoxLayout(orientation='vertical')
+
+        pcd = self.g.plus_courte_distance(som)
+
+        res = ""
+
+        for sommet in pcd.keys():
+            res += sommet.nom + " : " + str(pcd[sommet]) + "\n"
+
+        bl.add_widget(Label(text=res))
+
+        cancel_button = Button(text="Annuler")
+        cancel_button.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(cancel_button)
+
+        popup.content = bl
+        popup.open()
+
+    def pcd_change(self,adapter):
+        if len(adapter.selection) > 0:
+            self.disp_pcd(self.g.get_sommets()[int(adapter.selection[0].text[0]) - 1])
+
+    def popup_pcd(self,popup):
+        popup.dismiss()
+
+        popup = Popup(title='Choisissez un sommet',
+                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+        bl = BoxLayout(orientation='vertical')
+
+        list_adapter1 = ListAdapter(
+            data=[str(i + 1) + "- " + self.g.get_sommets()[i].nom for i in range(len(self.g.get_sommets()))],
+            cls=ListItemButton,
+            sorted_keys=[])
+        list_adapter1.bind(on_selection_change=lambda a: self.pcd_change(list_adapter1))
+        list_view1 = ListView(adapter=list_adapter1)
+
+        bl.add_widget(list_view1)
+
+        cancel_button = Button(text="Annuler")
+        cancel_button.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(cancel_button)
+
+        popup.content = bl
+        popup.open()
+
+    def algos(self):
+        popup = Popup(title='Executer un algorithme',
+                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+        bl = BoxLayout(orientation='vertical')
+
+        pr = Button(text="PageRank")
+        pr.bind(on_press=lambda a: self.popup_pagerank(popup))
+
+        pcd = Button(text="Plus courtes distances")
+        pcd.bind(on_press=lambda a: self.popup_pcd(popup))
+
+        bl.add_widget(pr)
+        bl.add_widget(pcd)
+
+        cancel_button = Button(text="Annuler")
+        cancel_button.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(cancel_button)
+
+        popup.content = bl
+        popup.open()
+
+    def p_name(self,popup):
+        popup.dismiss()
+
+        popup = Popup(title='Sommets par nom',
+                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+        bl = BoxLayout(orientation='vertical')
+
+        list_adapter1 = ListAdapter(
+            data=[str(i + 1) + "- " + self.g.get_sommets_by_name()[i].nom for i in range(len(self.g.get_sommets()))],
+            cls=ListItemButton,
+            sorted_keys=[])
+        list_adapter1.bind(on_selection_change=lambda a : self.selected(list_adapter1,"name"))
+        list_view1 = ListView(adapter=list_adapter1)
+
+        bl.add_widget(list_view1)
+
+        cancel_button = Button(text="Fermer")
+        cancel_button.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(cancel_button)
+
+        popup.content = bl
+        popup.open()
+
+    def selected(self, adapter, filter):
+        if len(adapter.selection) > 0:
+            pos = int(adapter.selection[0].text[0]) - 1
+            if filter == "name":
+                self.p_display(self.g.get_sommets_by_name()[pos])
+            if filter == "degre":
+                self.p_display(self.g.get_sommets_by_degree()[pos])
+
+    def p_degree(self,popup):
+        popup.dismiss()
+
+        popup = Popup(title='Sommets par degre',
+                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+        bl = BoxLayout(orientation='vertical')
+
+        list_adapter1 = ListAdapter(
+            data=[str(i + 1) + "- " + self.g.get_sommets_by_degree()[i].nom for i in range(len(self.g.get_sommets()))],
+            cls=ListItemButton,
+            sorted_keys=[])
+        list_adapter1.bind(on_selection_change=lambda a : self.selected(list_adapter1,"degre"))
+        list_view1 = ListView(adapter=list_adapter1)
+
+        bl.add_widget(list_view1)
+
+        cancel_button = Button(text="Fermer")
+        cancel_button.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(cancel_button)
+
+        popup.content = bl
+        popup.open()
+
+    def p_find(self,popup):
+        popup.dismiss()
+
+        popup = Popup(title='Chercher un sommet',
+                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+        bl = BoxLayout(orientation='vertical')
+
+        confirmButton = Button(text="Confirmer")
+
+        som_name = TextInput(multiline=False)
+
+        confirmButton.bind(on_press= lambda a : self.p_display(self.g.find_name(som_name.text)))
+
+        bl.add_widget(som_name)
+
+        bl.add_widget(confirmButton)
+
+        cancel_button = Button(text="Fermer")
+        cancel_button.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(cancel_button)
+
+        popup.content = bl
+        popup.open()
+
+    def p_display(self, som):
+        bl = BoxLayout(orientation='vertical')
+
+        if isinstance(som, Page):
+            popup = Popup(title='Page :',
+                          size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+            l = Label(text=som.__repr__())
+            bl.add_widget(l)
+        else:
+            if isinstance(som, Utilisateur):
+                popup = Popup(title='Utilisateur :',
+                            size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+                l = Label(text=som.__repr__())
+                bl.add_widget(l)
+            else:
+                popup = Popup(title='Impossible de trouver le sommet !')
+
+        cancel_button = Button(text="Fermer")
+        cancel_button.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(cancel_button)
+
+        popup.content = bl
+        popup.open()
+
+    def parcours(self):
+        popup = Popup(title='Ajouter un admin',
+                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+        bl = BoxLayout(orientation='vertical')
+
+        by_name = Button(text="Par nom")
+        by_name.bind(on_press=lambda  a: self.p_name(popup))
+
+        by_degree = Button(text="Par degre")
+        by_degree.bind(on_press=lambda a: self.p_degree(popup))
+
+        search = Button(text="Rechercher...")
+        search.bind(on_press=lambda a: self.p_find(popup))
+
+        bl.add_widget(by_name)
+        bl.add_widget(by_degree)
+        bl.add_widget(search)
+
+        cancel_button = Button(text="Annuler")
+        cancel_button.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(cancel_button)
+
+        popup.content = bl
+        popup.open()
 
     def a_admin(self, popup):
         self.g.get_pages()[self.to_connect[0]].add_admin(self.g.get_utils()[self.to_connect[1]])
@@ -166,10 +395,12 @@ class MainScreen(BoxLayout):
         popup.content = bl
         popup.open()
 
-
     def selection_change_del(self,adapter, confirmButton):
-        self.to_destroy = int(adapter.selection[0].text[0]) - 1
-        confirmButton.disabled = False
+        if len(adapter.selection) > 0:
+            self.to_destroy = int(adapter.selection[0].text[0]) - 1
+            confirmButton.disabled = False
+        else:
+            confirmButton.disabled = True
 
     def delete(self):
         popup = Popup(title='Choisissez un sommet a supprimer',
@@ -210,11 +441,17 @@ class MainScreen(BoxLayout):
     def selection_change(self, adapter, pos, adapter2, confirmButton):
         if len(adapter.selection) == 1 and len(adapter2.selection) == 1:
             confirmButton.disabled = False
-        self.to_connect[pos] = int(adapter.selection[0].text[0]) - 1
+        if len(adapter.selection) > 0:
+            self.to_connect[pos] = int(adapter.selection[0].text[0]) - 1
+        else:
+            confirmButton.disabled = True
 
     def selection_change_disco(self, adapter, pos, confirmButton):
-        self.to_disconnect[pos] = int(adapter.selection[0].text[0]) - 1
-        confirmButton.disabled = False
+        if len(adapter.selection) > 0:
+            self.to_disconnect[pos] = int(adapter.selection[0].text[0]) - 1
+            confirmButton.disabled = False
+        else:
+            confirmButton.disabled = True
 
     def disconnect(self, som, popup):
         popup.dismiss()
