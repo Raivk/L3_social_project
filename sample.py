@@ -20,6 +20,7 @@ class MainScreen(BoxLayout):
         self.g = Graphe()
         self.to_connect = [0,0]
         self.to_disconnect = [0,0]
+        self.to_destroy = 0
 
         add_util = Button(text="Ajouter un utilisateur")
         add_util.bind(on_press=lambda a : self.add_popup(True))
@@ -41,9 +42,165 @@ class MainScreen(BoxLayout):
 
         self.add_widget(del_connection)
 
+        del_som = Button(text="Supprimer un sommet")
+        del_som.bind(on_press=lambda a: self.delete())
+
+        self.add_widget(del_som)
+
+        add_admin = Button(text="Ajouter un admin")
+        add_admin.bind(on_press=lambda a: self.a_admin_popup())
+
+        self.add_widget(add_admin)
+
+        del_admin = Button(text="Supprimer un admin")
+        del_admin.bind(on_press=lambda a: self.d_admin_popup())
+
+        self.add_widget(del_admin)
+
         create_graph = Button(text="Afficher le graphe")
         create_graph.bind(on_press=lambda a : self.affiche())
         self.add_widget(create_graph)
+
+    def a_admin(self, popup):
+        self.g.get_pages()[self.to_connect[0]].add_admin(self.g.get_utils()[self.to_connect[1]])
+        popup.dismiss()
+
+    def a_admin_popup(self):
+        popup = Popup(title='Ajouter un admin',
+                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+        bl = BoxLayout(orientation='vertical')
+
+        confirm_button = Button(text="Confirmer")
+        confirm_button.disabled = True
+
+        gl_inputs = GridLayout(cols=2)
+
+        gl_inputs.add_widget(Label(text="Page"))
+        gl_inputs.add_widget(Label(text="Utilisateur"))
+
+        list_adapter1 = ListAdapter(data=[str(i + 1) + "- " + self.g.get_pages()[i].nom for i in range(len(self.g.get_pages()))], cls=ListItemButton,
+                                        sorted_keys=[])
+        list_adapter1.bind(on_selection_change=lambda a : self.selection_change(list_adapter1, 0, list_adapter2, confirm_button))
+        list_view1 = ListView(adapter=list_adapter1)
+
+        gl_inputs.add_widget(list_view1)
+
+        list_adapter2 = ListAdapter(data=[str(i + 1) + "- " + self.g.get_utils()[i].nom for i in range(len(self.g.get_utils()))], cls=ListItemButton,
+                                    sorted_keys=[])
+        list_adapter2.bind(on_selection_change=lambda a : self.selection_change(list_adapter2, 1, list_adapter1, confirm_button))
+        list_view2 = ListView(adapter=list_adapter2)
+
+        gl_inputs.add_widget(list_view2)
+
+        bl.add_widget(gl_inputs)
+
+        confirm_button.bind(on_press=lambda a: self.a_admin(popup))
+        cancel_button = Button(text="Annuler")
+        cancel_button.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(confirm_button)
+        bl.add_widget(cancel_button)
+
+        popup.content = bl
+        popup.open()
+
+    def d_admin(self, popup):
+        popup.dismiss()
+        p = self.g.get_pages()[self.to_disconnect[0]]
+        p.remove_admin(p.admins[self.to_disconnect[1]])
+
+    def d_admin_popup2(self, popup):
+        popup.dismiss()
+
+        popup = Popup(title='Choisissez un admin',
+                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+        bl = BoxLayout(orientation='vertical')
+
+        confirm_button = Button(text="Confirmer")
+        confirm_button.disabled = True
+
+        som = self.g.get_pages()[self.to_disconnect[0]]
+
+        list_adapter1 = ListAdapter(
+            data=[str(i + 1) + "- " + som.admins[i].nom for i in range(len(som.admins))],
+            cls=ListItemButton,
+            sorted_keys=[])
+        list_adapter1.bind(
+            on_selection_change=lambda a: self.selection_change_disco(list_adapter1, 1, confirm_button))
+        list_view1 = ListView(adapter=list_adapter1)
+
+        bl.add_widget(list_view1)
+
+        confirm_button.bind(on_press=lambda a: self.d_admin(popup))
+        cancel_button = Button(text="Annuler")
+        cancel_button.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(confirm_button)
+        bl.add_widget(cancel_button)
+
+        popup.content = bl
+        popup.open()
+
+    def d_admin_popup(self):
+        popup = Popup(title='Choisissez une page',
+                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+        bl = BoxLayout(orientation='vertical')
+
+        confirm_button = Button(text="Confirmer")
+        confirm_button.disabled = True
+
+        list_adapter1 = ListAdapter(
+            data=[str(i + 1) + "- " + self.g.get_pages()[i].nom for i in range(len(self.g.get_pages()))],
+            cls=ListItemButton,
+            sorted_keys=[])
+        list_adapter1.bind(
+            on_selection_change=lambda a: self.selection_change_disco(list_adapter1, 0, confirm_button))
+        list_view1 = ListView(adapter=list_adapter1)
+
+        bl.add_widget(list_view1)
+
+        confirm_button.bind(on_press=lambda a: self.d_admin_popup2(popup))
+        cancel_button = Button(text="Annuler")
+        cancel_button.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(confirm_button)
+        bl.add_widget(cancel_button)
+
+        popup.content = bl
+        popup.open()
+
+
+    def selection_change_del(self,adapter, confirmButton):
+        self.to_destroy = int(adapter.selection[0].text[0]) - 1
+        confirmButton.disabled = False
+
+    def delete(self):
+        popup = Popup(title='Choisissez un sommet a supprimer',
+                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+        bl = BoxLayout(orientation='vertical')
+
+        confirm_button = Button(text="Confirmer")
+        confirm_button.disabled = True
+
+        list_adapter1 = ListAdapter(
+            data=[str(i + 1) + "- " + self.g.get_sommets()[i].nom for i in range(len(self.g.get_sommets()))],
+            cls=ListItemButton,
+            sorted_keys=[])
+        list_adapter1.bind(
+            on_selection_change=lambda a: self.selection_change_del(list_adapter1, confirm_button))
+        list_view1 = ListView(adapter=list_adapter1)
+
+        bl.add_widget(list_view1)
+
+        confirm_button.bind(on_press=lambda a: self.delete_confirm(popup))
+        cancel_button = Button(text="Annuler")
+        cancel_button.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(confirm_button)
+        bl.add_widget(cancel_button)
+
+        popup.content = bl
+        popup.open()
+
+    def delete_confirm(self, popup):
+        self.g.remove_sommet(self.g.get_sommets()[self.to_destroy])
+        popup.dismiss()
 
     def connect(self,popup):
         self.g.connect(self.g.get_sommets()[self.to_connect[0]],

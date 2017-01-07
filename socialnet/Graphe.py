@@ -23,6 +23,20 @@ class Graphe:
     def get_sommets(self):
         return self.sommets
 
+    def get_pages(self):
+        res = []
+        for som in self.sommets:
+            if isinstance(som, Page):
+                res.append(som)
+        return res
+
+    def get_utils(self):
+        res = []
+        for som in self.sommets:
+            if isinstance(som, Utilisateur):
+                res.append(som)
+        return res
+
     def get_sommets_by_name(self):
         return sorted(self.sommets, key=operator.attrgetter('nom'))
 
