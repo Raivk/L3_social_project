@@ -12,6 +12,7 @@ class PyplotManager:
         self.deja = False
         self.tous = []
         self.thread1 = None
+        self.stop = threading.Event()
 
     def prepa(self, g): #prepare l'affichage du graph
         sommets_fic = {}
@@ -78,12 +79,12 @@ class PyplotManager:
             plt.annotate(sommet[3].get_nom(), (sommet[0], sommet[1]))
 
     def close(self):
-        self.thread1.run = False
+        self.stop.is_set()
         plt.close()
 
     def affiche(self, g):
         def run():
-            plt.show()
+            plt.show(block=False)
         self.deja = True
         self.thread1 = threading.Thread(None, run, {'nom': 'thread a'})
         self.thread1.start()

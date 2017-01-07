@@ -3,7 +3,6 @@ from Page import Page
 from Sommet import Sommet
 
 from socialnet.pyplotManager import PyplotManager
-import time
 
 import operator
 
@@ -16,7 +15,6 @@ class Graphe:
 
     def affiche(self):
         if self.pm == None:
-            print('la')
             self.pm = PyplotManager(self)
             self.pm.prepa(self)
             self.pm.affiche(self)
@@ -170,80 +168,87 @@ class Graphe:
         return res
 
     def save(self,nomFic):
-        sommets_fic = {}
-        fichier = open(nomFic, "w")
-        i = 0
-        for sommet in self.sommets:
-            fichier.write(str(i) + sommet.magie() + "\n") #tous les sommets
-            sommets_fic[i] = sommet
-            i = i + 1
-        fichier.write("---\n")
-        for idf in sommets_fic.keys():
-            toWrite = str(idf) + ":"
-            sommet = sommets_fic.get(idf)
-            wrote = False
-            for id2 in sommets_fic.keys():
-                sommet2 = sommets_fic.get(id2)
-                if sommet2 in sommet.get_connections():
-                    if not wrote:
-                        toWrite += str(id2)  # 1 suit 2
-                    else:
-                        toWrite += "," + str(id2)  # 1 suit 2
-                    wrote = True;
-                    #fichier.write(str(idf) + "," + str(id2) + "\n")  #1 suit 2
-            if wrote:
-                fichier.write(toWrite + "\n")
+        if nomFic[-7:] == ".projpy":
+            sommets_fic = {}
+            fichier = open(nomFic, "w")
+            i = 0
+            for sommet in self.sommets:
+                fichier.write(str(i) + sommet.magie() + "\n") #tous les sommets
+                sommets_fic[i] = sommet
+                i = i + 1
+            fichier.write("---\n")
+            for idf in sommets_fic.keys():
+                toWrite = str(idf) + ":"
+                sommet = sommets_fic.get(idf)
+                wrote = False
+                for id2 in sommets_fic.keys():
+                    sommet2 = sommets_fic.get(id2)
+                    if sommet2 in sommet.get_connections():
+                        if not wrote:
+                            toWrite += str(id2)  # 1 suit 2
+                        else:
+                            toWrite += "," + str(id2)  # 1 suit 2
+                        wrote = True;
+                        #fichier.write(str(idf) + "," + str(id2) + "\n")  #1 suit 2
+                if wrote:
+                    fichier.write(toWrite + "\n")
 
-        fichier.write("---\n")
-        for idf in sommets_fic.keys():
-            sommet = sommets_fic.get(idf)
-            if isinstance(sommet, Page):
-                if sommet.get_admins() != None:
-                    toWrite = str(idf) + ":"
-                    admins = sommet.get_admins()
-                    wrote = False
-                    for possible in sommets_fic:
-                        if sommets_fic.get(possible) in admins:
-                            if not wrote:
-                                toWrite += str(possible)  # 1 possede 2 en admin
-                            else:
-                                toWrite += "," + str(possible)  # 1 possede 2 en admin
-                            wrote = True
-                            #fichier.write(str(idf) + "," + str(possible)) #page, admin
-                    if wrote:
-                        fichier.write(toWrite + "\n")
+            fichier.write("---\n")
+            for idf in sommets_fic.keys():
+                sommet = sommets_fic.get(idf)
+                if isinstance(sommet, Page):
+                    if sommet.get_admins() != None:
+                        toWrite = str(idf) + ":"
+                        admins = sommet.get_admins()
+                        wrote = False
+                        for possible in sommets_fic:
+                            if sommets_fic.get(possible) in admins:
+                                if not wrote:
+                                    toWrite += str(possible)  # 1 possede 2 en admin
+                                else:
+                                    toWrite += "," + str(possible)  # 1 possede 2 en admin
+                                wrote = True
+                                #fichier.write(str(idf) + "," + str(possible)) #page, admin
+                        if wrote:
+                            fichier.write(toWrite + "\n")
 
-        fichier.close()
+            fichier.close()
+        else:
+            print("mauvais format.\nextention .projpy")
 
     def ouv(self, path):
-        fichier = open(path, "r")
-        i = 0
-        somm = {}
-        for ligne in fichier.readlines():
-            ligne = ligne.replace("\n", "")
-            if ligne == "---":
-                i = i + 1
-            else:
-                if i == 0:
-                    str = ligne.split(":")
-                    if str[1] == "U":
-                        carac = str[2].split(",")
-                        somm[str[0]] = Utilisateur(carac[0], carac[1], int(carac[2]))
-                        self.add_sommet(somm[str[0]])
-                    if str[1] == "P":
-                        somm[str[0]] = Page(str[2])
-                        self.add_sommet(somm[str[0]])
-                if i == 1:
-                    firstUtil = ligne.split(":")[0]
-                    others = ligne.split(":")[1].split(",")
-                    for followed in others:
-                        somm[firstUtil].connect(somm[followed])
-                if i == 2:
-                    thePage = ligne.split(":")[0]
-                    theAdmins = ligne.split(":")[1].split(",")
-                    for admin in theAdmins:
-                        somm[thePage].add_admin(somm[admin])
-        fichier.close()
+        if path[-7:] == ".projpy":
+            self.sommets=[]
+            fichier = open(path, "r")
+            i = 0
+            somm = {}
+            for ligne in fichier.readlines():
+                ligne = ligne.replace("\n", "")
+                if ligne == "---":
+                    i = i + 1
+                else:
+                    if i == 0:
+                        str = ligne.split(":")
+                        if str[1] == "U":
+                            carac = str[2].split(",")
+                            somm[str[0]] = Utilisateur(carac[0], carac[1], int(carac[2]))
+                            self.add_sommet(somm[str[0]])
+                        if str[1] == "P":
+                            somm[str[0]] = Page(str[2])
+                            self.add_sommet(somm[str[0]])
+                    if i == 1:
+                        firstUtil = ligne.split(":")[0]
+                        others = ligne.split(":")[1].split(",")
+                        for followed in others:
+                            somm[firstUtil].connect(somm[followed])
+                    if i == 2:
+                        thePage = ligne.split(":")[0]
+                        theAdmins = ligne.split(":")[1].split(",")
+                        for admin in theAdmins:
+                            somm[thePage].add_admin(somm[admin])
+            fichier.close()
+        else:
+            print("mauvais format.\nextention .projpy")
 
     def __repr__(self):
         res = "["
