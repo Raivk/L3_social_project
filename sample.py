@@ -357,7 +357,11 @@ class MainScreen(BoxLayout):
 
     def pcd_change(self,adapter):
         if len(adapter.selection) > 0:
-            self.disp_pcd(self.g.get_sommets()[int(adapter.selection[0].text[0]) - 1])
+            res = ""
+            for i in range(0, len(adapter.selection[0].text)):
+                if adapter.selection[0].text[i] == "-":
+                    res = adapter.selection[0].text[0: i]
+            self.disp_pcd(self.g.get_sommets()[int(res) - 1])
 
     def popup_pcd(self,popup):
         popup.dismiss()
@@ -428,7 +432,11 @@ class MainScreen(BoxLayout):
 
     def selected(self, adapter, filter):
         if len(adapter.selection) > 0:
-            pos = int(adapter.selection[0].text[0]) - 1
+            res = 0
+            for i in range(0, len(adapter.selection[0].text)):
+                if adapter.selection[0].text[i] == "-":
+                    res = adapter.selection[0].text[0:i]
+            pos = int(res) - 1
             if filter == "name":
                 self.p_display(self.g.get_sommets_by_name()[pos])
             if filter == "degre":
@@ -639,7 +647,11 @@ class MainScreen(BoxLayout):
 
     def selection_change_del(self,adapter, confirmButton):
         if len(adapter.selection) > 0:
-            self.to_destroy = int(adapter.selection[0].text[0]) - 1
+            res = ""
+            for i in range(0, len(adapter.selection[0].text)):
+                if adapter.selection[0].text[i] == "-":
+                    res = adapter.selection[0].text[0: i]
+            self.to_destroy = int(res) - 1
             confirmButton.disabled = False
         else:
             confirmButton.disabled = True
@@ -684,13 +696,21 @@ class MainScreen(BoxLayout):
         if len(adapter.selection) == 1 and len(adapter2.selection) == 1:
             confirmButton.disabled = False
         if len(adapter.selection) > 0:
-            self.to_connect[pos] = int(adapter.selection[0].text[0]) - 1
+            res = ""
+            for i in range(0, len(adapter.selection[0].text)):
+                if adapter.selection[0].text[i] == "-":
+                    res = adapter.selection[0].text[0: i]
+            self.to_connect[pos] = int(res) - 1
         else:
             confirmButton.disabled = True
 
     def selection_change_disco(self, adapter, pos, confirmButton):
         if len(adapter.selection) > 0:
-            self.to_disconnect[pos] = int(adapter.selection[0].text[0]) - 1
+            res = ""
+            for i in range(0,len(adapter.selection[0].text)):
+                if adapter.selection[0].text[i] == "-":
+                    res = adapter.selection[0].text[0 : i]
+            self.to_disconnect[pos] = int(res) - 1
             confirmButton.disabled = False
         else:
             confirmButton.disabled = True

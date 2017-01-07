@@ -1,0 +1,23 @@
+0:U:jean,jean_p,41
+1:U:louis,kevin,14
+2:U:Chattam,Maxime,54
+3:U:Coben,Harlan,56
+4:U:Ed,Junior,3
+5:U:Aloin,Patricia,22
+6:U:Miciano,Steve,78
+7:U:Garcia,Wendy,36
+8:P:Faute de preuves
+9:P:Le requiem des abysses
+10:P:AXEEL Group
+11:P:SERM
+---
+0:1,2,3,7,8
+3:4
+4:0
+6:4
+7:6
+---
+8:3
+9:2
+10:1
+11:4
