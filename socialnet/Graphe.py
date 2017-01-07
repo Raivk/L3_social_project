@@ -166,9 +166,9 @@ class Graphe:
                     res[som2] = alt
         return res
 
-    def save(self):
+    def save(self,nomFic):
         sommets_fic = {}
-        fichier = open("lasauvegardedelamortquitue.stylux", "w")
+        fichier = open(nomFic, "w")
         i = 0
         for sommet in self.sommets:
             fichier.write(str(i) + sommet.magie() + "\n") #tous les sommets

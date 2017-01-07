@@ -11,6 +11,10 @@ from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 from kivy.adapters.dictadapter import ListAdapter
 from kivy.uix.listview import ListView, ListItemButton
+from kivy.uix.floatlayout import FloatLayout
+from kivy.factory import Factory
+from kivy.properties import ObjectProperty
+from kivy.uix.filechooser import FileChooserIconView
 
 class MainScreen(BoxLayout):
 
@@ -22,40 +26,20 @@ class MainScreen(BoxLayout):
         self.to_disconnect = [0,0]
         self.to_destroy = 0
 
-        add_util = Button(text="Ajouter un utilisateur")
-        add_util.bind(on_press=lambda a : self.add_popup(True))
+        gest_sommet = Button(text="Gestion des sommets")
+        gest_sommet.bind(on_press=lambda a : self.gest_s())
 
-        self.add_widget(add_util)
+        self.add_widget(gest_sommet)
 
-        add_page = Button(text="Ajouter une page")
-        add_page.bind(on_press=lambda a: self.add_popup(False))
+        gest_arcs = Button(text="Gestion des arcs")
+        gest_arcs.bind(on_press=lambda a : self.gest_ar())
 
-        self.add_widget(add_page)
+        self.add_widget(gest_arcs)
 
-        add_connection = Button(text="Connecter")
-        add_connection.bind(on_press=lambda a: self.connect_popup())
+        gest_ads = Button(text="Gestion des admins")
+        gest_ads.bind(on_press=lambda a : self.gest_ad())
 
-        self.add_widget(add_connection)
-
-        del_connection = Button(text="Deconnecter")
-        del_connection.bind(on_press=lambda a: self.disconnect_popup())
-
-        self.add_widget(del_connection)
-
-        del_som = Button(text="Supprimer un sommet")
-        del_som.bind(on_press=lambda a: self.delete())
-
-        self.add_widget(del_som)
-
-        add_admin = Button(text="Ajouter un admin")
-        add_admin.bind(on_press=lambda a: self.a_admin_popup())
-
-        self.add_widget(add_admin)
-
-        del_admin = Button(text="Supprimer un admin")
-        del_admin.bind(on_press=lambda a: self.d_admin_popup())
-
-        self.add_widget(del_admin)
+        self.add_widget(gest_ads)
 
         display_soms = Button(text="Parcourir les sommets")
         display_soms.bind(on_press=lambda a: self.parcours())
@@ -67,15 +51,247 @@ class MainScreen(BoxLayout):
 
         self.add_widget(algos)
 
+        loadsave = Button(text="Charger/Sauvegarder")
+        loadsave.bind(on_press=lambda a: self.popup_loadsave())
+
+        self.add_widget(loadsave)
+
         create_graph = Button(text="Afficher le graphe")
         create_graph.bind(on_press=lambda a : self.affiche())
         self.add_widget(create_graph)
+
+        list_succ = Button(text="Afficher par liste de successeurs")
+        list_succ.bind(on_press=lambda a : self.aff_list_succ())
+        self.add_widget(list_succ)
+
+    def aff_list_succ(self):
+        popup = Popup(title='Liste de successeurs', size_hint=(0.9, 0.9), auto_dismiss=False)
+        bl = BoxLayout(orientation="vertical")
+
+        list_adapter1 = ListAdapter(
+            data=[str(i + 1) + "- " + self.g.get_sommets()[i].__repr__() for i in range(len(self.g.get_sommets()))],
+            cls=ListItemButton,
+            sorted_keys=[])
+        list_adapter1.bind(on_selection_change=lambda a: self.selected(list_adapter1,"no_filter"))
+        list_view1 = ListView(adapter=list_adapter1)
+
+        bl.add_widget(list_view1)
+
+        bt = Button(text="Fermer")
+        bt.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(bt)
+        popup.content = bl
+        popup.open()
+
+    def gest_ar(self):
+        popup = Popup(title='Gestion des arcs',
+                     size_hint=(0.9, 0.9), auto_dismiss=False)
+        bl = BoxLayout(orientation="vertical")
+
+        add_connection = Button(text="Connecter")
+        add_connection.bind(on_press=lambda a: self.connect_popup())
+        add_connection.bind(on_release=lambda a: popup.dismiss())
+
+        bl.add_widget(add_connection)
+
+        del_connection = Button(text="Deconnecter")
+        del_connection.bind(on_press=lambda a: self.disconnect_popup())
+        del_connection.bind(on_release=lambda a: popup.dismiss())
+
+        bl.add_widget(del_connection)
+
+        bt = Button(text="Fermer")
+        bt.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(bt)
+        popup.content = bl
+        popup.open()
+
+    def gest_ad(self):
+        popup = Popup(title='Gestion des admins',
+                     size_hint=(0.9, 0.9), auto_dismiss=False)
+        bl = BoxLayout(orientation="vertical")
+
+        add_admin = Button(text="Ajouter un admin")
+        add_admin.bind(on_press=lambda a: self.a_admin_popup())
+        add_admin.bind(on_release=lambda a: popup.dismiss())
+
+        bl.add_widget(add_admin)
+
+        del_admin = Button(text="Supprimer un admin")
+        del_admin.bind(on_press=lambda a: self.d_admin_popup())
+        del_admin.bind(on_release=lambda a: popup.dismiss())
+
+        bl.add_widget(del_admin)
+
+        bt = Button(text="Fermer")
+        bt.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(bt)
+        popup.content = bl
+        popup.open()
+
+    def gest_s(self):
+        popup = Popup(title='Gestion des sommets',
+                     size_hint=(0.9, 0.9), auto_dismiss=False)
+        bl = BoxLayout(orientation="vertical")
+
+        add_util = Button(text="Ajouter un utilisateur")
+        add_util.bind(on_press=lambda a: self.add_popup(True))
+        add_util.bind(on_release=lambda a: popup.dismiss())
+
+        bl.add_widget(add_util)
+
+        add_page = Button(text="Ajouter une page")
+        add_page.bind(on_press=lambda a: self.add_popup(False))
+        add_page.bind(on_release=lambda a: popup.dismiss())
+
+        bl.add_widget(add_page)
+
+        del_som = Button(text="Supprimer un sommet")
+        del_som.bind(on_press=lambda a: self.delete())
+        del_som.bind(on_release=lambda a: popup.dismiss())
+
+        bl.add_widget(del_som)
+
+        bt = Button(text="Fermer")
+        bt.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(bt)
+        popup.content = bl
+        popup.open()
+
+    def load_confirm(self, selection, popup):
+        if len(selection) > 0:
+            self.g.ouv(selection[0])
+            popup.dismiss()
+        else:
+            pop = Popup(title='Pas de fichier selectionne',
+                   size_hint=(0.9, 0.9), auto_dismiss=False)
+            bl = BoxLayout()
+            bt = Button(text="Fermer")
+            bt.bind(on_press=lambda a : pop.dismiss())
+            bl.add_widget(bt)
+            pop.content = bl
+            pop.open()
+
+    def load(self, popup):
+        popup.dismiss()
+
+        popup = Popup(title='Charger',
+                       size_hint=(0.9, 0.9), auto_dismiss=False)
+        bl_main = BoxLayout(orientation='vertical')
+        bl = BoxLayout(orientation='vertical')
+
+        flc = FileChooserIconView()
+
+        bl_main.add_widget(flc)
+
+        confirm_button = Button(text="Confirmer")
+        confirm_button.bind(on_press=lambda a: self.load_confirm(flc.selection, popup))
+        bl.add_widget(confirm_button)
+
+        cancel_button = Button(text="Annuler")
+        cancel_button.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(cancel_button)
+
+        bl_main.add_widget(bl)
+
+        popup.content = bl_main
+        popup.open()
+
+
+    def p_newfile_confirm(self,popup,text):
+        print(text)
+        open(text, 'a').close()
+        popup.dismiss()
+
+    def p_newfile(self,path):
+        pop = Popup(title='Nouveau fichier',
+                     size_hint=(0.9, 0.9), auto_dismiss=False)
+        bl = BoxLayout(orientation='vertical')
+
+        text = TextInput()
+        bl.add_widget(text)
+
+        btc = Button(text="Confirmer")
+        btc.bind(on_press=lambda a: self.p_newfile_confirm(pop, path + "/" + text.text + ".projpy"))
+        bl.add_widget(btc)
+
+        btf = Button(text="Fermer")
+        btf.bind(on_press=lambda a: pop.dismiss())
+        bl.add_widget(btf)
+        pop.content = bl
+        pop.open()
+
+    def save_confirm(self, selection, popup):
+        if len(selection) > 0:
+            self.g.save(selection[0])
+            popup.dismiss()
+        else:
+            pop = Popup(title='Pas de fichier selectionne',
+                         size_hint=(0.9, 0.9), auto_dismiss=False)
+            bl = BoxLayout()
+            bt = Button(text="Fermer")
+            bt.bind(on_press=lambda a: pop.dismiss())
+            bl.add_widget(bt)
+            pop.content = bl
+            pop.open()
+
+    def save(self, popup):
+        popup.dismiss()
+
+        popup = Popup(title='Charger',
+                       size_hint=(0.9, 0.9), auto_dismiss=False)
+        bl_main = BoxLayout(orientation='vertical')
+        bl = BoxLayout(orientation='vertical')
+
+        flc = FileChooserIconView()
+
+        bl_main.add_widget(flc)
+
+        newFile = Button(text="Nouveau fichier")
+        newFile.bind(on_press=lambda a : self.p_newfile(flc.path))
+        bl.add_widget(newFile)
+
+        confirm = Button(text="Confirmer")
+        confirm.bind(on_press=lambda a : self.save_confirm(flc.selection,popup))
+        bl.add_widget(confirm)
+
+        cancel_button = Button(text="Annuler")
+        cancel_button.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(cancel_button)
+
+        bl_main.add_widget(bl)
+
+        popup.content = bl_main
+        popup.open()
+
+    def popup_loadsave(self):
+        popup = Popup(title='Charger / Sauvegarder',
+                       size_hint=(0.9, 0.9), auto_dismiss=False)
+        bl = BoxLayout(orientation='vertical')
+
+        load = Button(text="Charger")
+        load.bind(on_press=lambda a: self.load(popup))
+
+        bl.add_widget(load)
+
+        save = Button(text="Sauvegarder")
+        save.bind(on_press=lambda a: self.save(popup))
+
+        bl.add_widget(save)
+
+        cancel_button = Button(text="Annuler")
+        cancel_button.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(cancel_button)
+
+        popup.content = bl
+        popup.open()
+
 
     def popup_pagerank(self,popup):
         popup.dismiss()
 
         popup = Popup(title='PageRank',
-                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+                       size_hint=(0.9, 0.9), auto_dismiss=False)
         bl = BoxLayout(orientation='vertical')
 
         pr = self.g.page_rank()
@@ -96,7 +312,7 @@ class MainScreen(BoxLayout):
 
     def disp_pcd(self,som):
         popup = Popup(title='Plus courtes distances',
-                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+                       size_hint=(0.9, 0.9), auto_dismiss=False)
         bl = BoxLayout(orientation='vertical')
 
         pcd = self.g.plus_courte_distance(som)
@@ -123,7 +339,7 @@ class MainScreen(BoxLayout):
         popup.dismiss()
 
         popup = Popup(title='Choisissez un sommet',
-                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+                       size_hint=(0.9, 0.9), auto_dismiss=False)
         bl = BoxLayout(orientation='vertical')
 
         list_adapter1 = ListAdapter(
@@ -144,7 +360,7 @@ class MainScreen(BoxLayout):
 
     def algos(self):
         popup = Popup(title='Executer un algorithme',
-                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+                       size_hint=(0.9, 0.9), auto_dismiss=False)
         bl = BoxLayout(orientation='vertical')
 
         pr = Button(text="PageRank")
@@ -167,7 +383,7 @@ class MainScreen(BoxLayout):
         popup.dismiss()
 
         popup = Popup(title='Sommets par nom',
-                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+                       size_hint=(0.9, 0.9), auto_dismiss=False)
         bl = BoxLayout(orientation='vertical')
 
         list_adapter1 = ListAdapter(
@@ -193,12 +409,14 @@ class MainScreen(BoxLayout):
                 self.p_display(self.g.get_sommets_by_name()[pos])
             if filter == "degre":
                 self.p_display(self.g.get_sommets_by_degree()[pos])
+            if filter == "no_filter":
+                self.p_display(self.g.get_sommets()[pos])
 
     def p_degree(self,popup):
         popup.dismiss()
 
         popup = Popup(title='Sommets par degre',
-                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+                       size_hint=(0.9, 0.9), auto_dismiss=False)
         bl = BoxLayout(orientation='vertical')
 
         list_adapter1 = ListAdapter(
@@ -221,7 +439,7 @@ class MainScreen(BoxLayout):
         popup.dismiss()
 
         popup = Popup(title='Chercher un sommet',
-                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+                       size_hint=(0.9, 0.9), auto_dismiss=False)
         bl = BoxLayout(orientation='vertical')
 
         confirmButton = Button(text="Confirmer")
@@ -246,13 +464,13 @@ class MainScreen(BoxLayout):
 
         if isinstance(som, Page):
             popup = Popup(title='Page :',
-                          size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+                           size_hint=(0.9, 0.9), auto_dismiss=False)
             l = Label(text=som.__repr__())
             bl.add_widget(l)
         else:
             if isinstance(som, Utilisateur):
                 popup = Popup(title='Utilisateur :',
-                            size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+                             size_hint=(0.9, 0.9), auto_dismiss=False)
                 l = Label(text=som.__repr__())
                 bl.add_widget(l)
             else:
@@ -267,7 +485,7 @@ class MainScreen(BoxLayout):
 
     def parcours(self):
         popup = Popup(title='Ajouter un admin',
-                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+                       size_hint=(0.9, 0.9), auto_dismiss=False)
         bl = BoxLayout(orientation='vertical')
 
         by_name = Button(text="Par nom")
@@ -296,7 +514,7 @@ class MainScreen(BoxLayout):
 
     def a_admin_popup(self):
         popup = Popup(title='Ajouter un admin',
-                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+                       size_hint=(0.9, 0.9), auto_dismiss=False)
         bl = BoxLayout(orientation='vertical')
 
         confirm_button = Button(text="Confirmer")
@@ -341,7 +559,7 @@ class MainScreen(BoxLayout):
         popup.dismiss()
 
         popup = Popup(title='Choisissez un admin',
-                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+                       size_hint=(0.9, 0.9), auto_dismiss=False)
         bl = BoxLayout(orientation='vertical')
 
         confirm_button = Button(text="Confirmer")
@@ -370,7 +588,7 @@ class MainScreen(BoxLayout):
 
     def d_admin_popup(self):
         popup = Popup(title='Choisissez une page',
-                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+                       size_hint=(0.9, 0.9), auto_dismiss=False)
         bl = BoxLayout(orientation='vertical')
 
         confirm_button = Button(text="Confirmer")
@@ -404,7 +622,7 @@ class MainScreen(BoxLayout):
 
     def delete(self):
         popup = Popup(title='Choisissez un sommet a supprimer',
-                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+                       size_hint=(0.9, 0.9), auto_dismiss=False)
         bl = BoxLayout(orientation='vertical')
 
         confirm_button = Button(text="Confirmer")
@@ -461,7 +679,7 @@ class MainScreen(BoxLayout):
         popup.dismiss()
 
         popup = Popup(title='Choisissez un second sommet',
-                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+                       size_hint=(0.9, 0.9), auto_dismiss=False)
         bl = BoxLayout(orientation='vertical')
 
         confirm_button = Button(text="Confirmer")
@@ -490,7 +708,7 @@ class MainScreen(BoxLayout):
 
     def disconnect_popup(self):
         popup = Popup(title='Choisissez un premier sommet',
-                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+                       size_hint=(0.9, 0.9), auto_dismiss=False)
         bl = BoxLayout(orientation='vertical')
 
         confirm_button = Button(text="Confirmer")
@@ -517,7 +735,7 @@ class MainScreen(BoxLayout):
 
     def connect_popup(self):
         popup = Popup(title='Connecter deux sommets',
-                      size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+                       size_hint=(0.9, 0.9), auto_dismiss=False)
         bl = BoxLayout(orientation='vertical')
 
         confirm_button = Button(text="Confirmer")
@@ -556,7 +774,7 @@ class MainScreen(BoxLayout):
     def add_popup(self,isUtil):
         if isUtil:
             popup = Popup(title='Ajouter un Utilisateur',
-                          size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+                           size_hint=(0.9, 0.9), auto_dismiss=False)
             bl = BoxLayout(orientation='vertical')
 
             gl_inputs = GridLayout(cols=2)
@@ -582,7 +800,7 @@ class MainScreen(BoxLayout):
             popup.open()
         else:
             popup = Popup(title='Ajouter une Page',
-                          size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+                           size_hint=(0.9, 0.9), auto_dismiss=False)
             bl = BoxLayout(orientation='vertical')
 
             gl_inputs = GridLayout(cols=2)
