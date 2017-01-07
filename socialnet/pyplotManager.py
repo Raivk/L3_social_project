@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from Utilisateur import Utilisateur
 from Page import Page
 import random
+import threading
 
 class PyplotManager:
 
@@ -10,6 +11,7 @@ class PyplotManager:
     def __init__(self, g):
         self.deja = False
         self.tous = []
+        self.thread1 = None
 
     def prepa(self, g): #prepare l'affichage du graph
         sommets_fic = {}
@@ -76,11 +78,16 @@ class PyplotManager:
             plt.annotate(sommet[3].get_nom(), (sommet[0], sommet[1]))
 
     def close(self):
+        self.thread1.run = False
         plt.close()
 
     def affiche(self, g):
+        def run():
+            plt.show()
         self.deja = True
-        plt.show(block=False)
+        self.thread1 = threading.Thread(None, run, {'nom': 'thread a'})
+        self.thread1.start()
+
 
     def getdeja(self):
         return self.deja

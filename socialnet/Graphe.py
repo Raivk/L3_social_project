@@ -16,8 +16,12 @@ class Graphe:
 
     def affiche(self):
         if self.pm == None:
+            print('la')
             self.pm = PyplotManager(self)
-        self.pm.refresh(self)
+            self.pm.prepa(self)
+            self.pm.affiche(self)
+        else:
+            self.pm.refresh(self)
         print(self)
 
     def get_sommets(self):
