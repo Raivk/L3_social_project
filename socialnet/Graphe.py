@@ -91,11 +91,14 @@ class Graphe:
         return res
 
     def get_moy_age(self):
-        total = 0
-        for som in self.sommets:
-            if isinstance(som, Utilisateur):
-                total+= som.get_age()
-        return total / self.get_nb_util()
+        if self.som_len() == 0:
+            return 0
+        else:
+            total = 0
+            for som in self.sommets:
+                if isinstance(som, Utilisateur):
+                    total += som.get_age()
+            return total / self.get_nb_util()
 
     def add_sommet(self, som):
         if som not in self.sommets and isinstance(som,Sommet):

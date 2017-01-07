@@ -64,6 +64,30 @@ class MainScreen(BoxLayout):
         list_succ.bind(on_press=lambda a : self.aff_list_succ())
         self.add_widget(list_succ)
 
+        stats = Button(text="Statistiques")
+        stats.bind(on_press=lambda a : self.statist())
+        self.add_widget(stats)
+
+    def statist(self):
+        popup = Popup(title='Liste de successeurs', size_hint=(0.9, 0.9), auto_dismiss=False)
+        bl = BoxLayout(orientation="vertical")
+
+        res = ""
+
+        res += "Moyenne d'age : " + str(self.g.get_moy_age()) + "\n"
+        res += "Nombre de pages : " + str(self.g.get_nb_page()) + "\n"
+        res += "Nombre d'utilisateurs : " + str(self.g.get_nb_util()) + "\n"
+        res += "Nombre de sommets : " + str(self.g.som_len()) + "\n"
+        res += "Nombre d'arcs : " + str(self.g.arc_len())
+
+        bl.add_widget(Label(text=res))
+
+        bt = Button(text="Fermer")
+        bt.bind(on_press=lambda a: popup.dismiss())
+        bl.add_widget(bt)
+        popup.content = bl
+        popup.open()
+
     def aff_list_succ(self):
         popup = Popup(title='Liste de successeurs', size_hint=(0.9, 0.9), auto_dismiss=False)
         bl = BoxLayout(orientation="vertical")
@@ -821,6 +845,10 @@ class MainScreen(BoxLayout):
 
     def add_sommet_popup(self, popup, type, name, firstname="default", age=0):
         if type == "Utilisateur":
+            if len(age) == 0:
+                age = 0
+            else:
+                age = int(age)
             self.g.add_sommet(Utilisateur(name, firstname, age))
             popup.dismiss()
         if type == "Page":
