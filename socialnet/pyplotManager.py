@@ -14,12 +14,12 @@ class PyplotManager:
     def prepa(self, g): #prepare l'affichage du graph
         sommets_fic = {}
         i = 0
-
-        for sommet in g.get_sommets():
+        for sommet in g.get_sommets(): # creer les sommets
             valid = False
             for elem in self.tous:
                 if elem[3] == sommet:
                     self.addPoint(self.tous[i])
+                    sommets_fic[i] = sommet
                     valid = True
             if valid == False:
                 randx, randy = self.randvalid()
@@ -31,13 +31,13 @@ class PyplotManager:
                     self.addPoint(self.tous[i])
                 sommets_fic[i] = sommet
             i = i + 1
-        for idf in sommets_fic.keys():
+        for idf in sommets_fic.keys(): # les relie si besoins
             sommet = sommets_fic.get(idf)
             for id2 in sommets_fic.keys():
                 sommet2 = sommets_fic.get(id2)
                 if sommet2 in sommet.get_connections():
                     self.drawArrow(self.tous[idf], self.tous[id2])
-        for idf in sommets_fic.keys():
+        for idf in sommets_fic.keys(): # les relie si besoins(admin)
             sommet = sommets_fic.get(idf)
             if isinstance(sommet, Page):
                 if sommet.get_admins() != None:
