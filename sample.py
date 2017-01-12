@@ -320,12 +320,13 @@ class MainScreen(BoxLayout):
 
         pr = self.g.page_rank()
 
-        res = ""
+        list_adapter1 = ListAdapter(
+            data=[keySom.nom + " : " + str(pr[keySom]) for keySom in pr.keys()],
+            cls=ListItemButton,
+            sorted_keys=[])
+        list_view1 = ListView(adapter=list_adapter1)
 
-        for som in pr.keys():
-            res += som.nom + " : " + str(pr[som]) + "\n"
-
-        bl.add_widget(Label(text=res))
+        bl.add_widget(list_view1)
 
         cancel_button = Button(text="Annuler")
         cancel_button.bind(on_press=lambda a: popup.dismiss())
@@ -341,12 +342,13 @@ class MainScreen(BoxLayout):
 
         pcd = self.g.plus_courte_distance(som)
 
-        res = ""
+        list_adapter1 = ListAdapter(
+            data=[keySom.nom + " : " + str(pcd[keySom]) for keySom in pcd.keys()],
+            cls=ListItemButton,
+            sorted_keys=[])
+        list_view1 = ListView(adapter=list_adapter1)
 
-        for sommet in pcd.keys():
-            res += sommet.nom + " : " + str(pcd[sommet]) + "\n"
-
-        bl.add_widget(Label(text=res))
+        bl.add_widget(list_view1)
 
         cancel_button = Button(text="Annuler")
         cancel_button.bind(on_press=lambda a: popup.dismiss())

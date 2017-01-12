@@ -21,5 +21,10 @@ Installation : (pour windows et linux (linux est plus simple))
         -> "sudo apt-get update"
         -> "sudo apt-get install python-kivy"
 
+- installer matplotlib
+    -> python -m pip install -U pip setuptools
+    -> python -m pip install matplotlib
+    - Si installation non standard de python, se réferer à : http://matplotlib.org/users/installing.html
+
 POUR FINIR :
     -> Lancer l'application avec "python sample.py" dans le répertoire principal

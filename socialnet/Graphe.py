@@ -138,10 +138,16 @@ class Graphe:
         while i <= 100:
             for som in self.sommets:
                 tempPr = 0
+                near = 0
                 for som2 in self.sommets:
                     if som in som2.out:
                         tempPr += (res[som2] / float(len(som2.out)))
-                res[som] = (0.15 / float(len(self.sommets))) + (0.85 * tempPr)
+                        if som2 not in som.out:
+                            near += 1
+                near += len(som.out)
+                if near == 0:
+                    near = 1
+                res[som] = (0.15 / float(near)) + (0.85 * tempPr)
             i += 1
         return res
 
